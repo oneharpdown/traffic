@@ -23,8 +23,10 @@ public class IntersectionService {
     }
 
     public void turnOffAllLightsAtIntersection(int intersectionId) {
-        var intersection = this.intersectionRepository.findById(intersectionId);
-        intersection.ifPresentOrElse(Intersection::turnOffLights, () -> log.warn("Intersection {} not found", intersectionId));
+        var intersectionOption = this.intersectionRepository.findById(intersectionId);
+        intersectionOption.ifPresentOrElse(intersection -> {
+            intersection.turnOffLights(); intersectionRepository.save(intersection);
+            }, () -> log.warn("Intersection {} not found", intersectionId));
     }
 
     public void setLightStatus(int intersectionId, RoadDesignation roadDesignation, LightStatus lightStatus) {
@@ -36,6 +38,7 @@ public class IntersectionService {
                 case road_B: intersection.setRoadBLightColor(lightStatus);
                 break;
             }
+            intersectionRepository.save(intersection);
         }, () -> log.warn("Intersection {} not found", intersectionId));
 
     }
